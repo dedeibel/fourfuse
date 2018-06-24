@@ -6,7 +6,7 @@ Readonly 4chan fuse filesystem in golang (on linux)
 
 
 ```
-go get https://github.com/dedeibel/fourfuse
+go get github.com/dedeibel/fourfuse
 ```
 
 Fuse must be installed.
@@ -23,6 +23,7 @@ Tested on debian stretch with go 1.10
 ## Usage
 
 ```
+mkdir /tmp/mnt
 fourfuse /tmp/mnt
 ```
 
@@ -101,7 +102,7 @@ fourfuse /tmp/mnt
 # Download all files in the images/ directories - will take a while
 rsync --recursive --human-readable --stats --progress --time-limit=30 --prune-empty-dirs --include="*/" --include="images/*.*" --exclude="*" /tmp/mnt/Photography /tmp/photos
 
-# Remove empty directories 
+# Remove empty directories
 find . -type d -empty -delete
 ```
 
