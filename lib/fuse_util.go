@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"bazil.org/fuse"
-	fourc "github.com/dedeibel/go-4chan-api/api"
+	fourc "github.com/moshee/go-4chan-api/api"
 )
 
 type HasDirent interface {

@@ -136,8 +136,7 @@ goimports -w -d .
 ## Dependencies
 
 * [bazil/fuse](https://github.com/bazil/fuse) – thanks!
-* [dedeibel/go-4chan-api](https://github.com/dedeibel/go-4chan-api)
-    * a fork with fixes for [moshee/go-4chan-api](https://github.com/moshee/go-4chan-api) – thanks!
+* [moshee/go-4chan-api](https://github.com/moshee/go-4chan-api) – thanks!
 
 ## References
 

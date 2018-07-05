@@ -9,7 +9,7 @@ import (
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
-	fourc "github.com/dedeibel/go-4chan-api/api"
+	fourc "github.com/moshee/go-4chan-api/api"
 	"golang.org/x/net/context"
 )
 
