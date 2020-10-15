@@ -11,6 +11,13 @@ import (
 	"golang.org/x/net/context"
 )
 
+// Download remote files early on "Attr" call. This will help with
+// file browsers that are otherwise confused with 0 size thumbnails.
+// The posts main images are not affacted because their size is available
+// as meta data in advance.
+// Disable it if you do not need thumbnails.
+const EARLY_REMOTE_DOWNLOAD = true
+
 type RemoteFile struct {
 	slug               string
 	url                string
@@ -33,6 +40,14 @@ func NewRemoteFile(inode uint64, slug string, url string, size uint64) *RemoteFi
 func (f *RemoteFile) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = f.inode
 	a.Mode = 0444
+
+  // assume 0 means not downloaded, post images have their size already set,
+  // they will be downloaded on ReadAll
+  if EARLY_REMOTE_DOWNLOAD && f.size == 0 {
+    f.Download(true)
+    f.fileAccessCallback.onAccess(f)
+  }
+
 	a.Size = uint64(f.size)
 	return nil
 }
