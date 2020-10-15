@@ -55,7 +55,7 @@ func (t *Thread) fetchPosts() {
 	t.postsDir = NewPostsDir("posts", t.posts)
 	t.thumbnails.SortByLocale()
 
-	t.imageDir = NewImageDir("images", t.allPostsImages())
+	t.imageDir = NewImageDir(t.slug + " images", t.allPostsImages())
 	t.thumbnailsDir = NewImageDirFromImageList("thumbnails", t.thumbnails)
 	LogDebugf("fetch done for: %s\n", t.slug)
 }
