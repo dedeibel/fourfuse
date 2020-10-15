@@ -16,6 +16,7 @@ const (
 	HASH_POST_COMMENT            = "pc"
 	HASH_POST_SUBJECT            = "ps"
 	HASH_IMAGE_DIR_PREFIX        = "id"
+	HASH_POSTS_DIR_PREFIX        = "pd"
 )
 
 func hashs(str string) uint64 {

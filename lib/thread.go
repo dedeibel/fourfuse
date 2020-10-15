@@ -17,6 +17,7 @@ type Thread struct {
 	slug          string
 	inode         uint64
 	posts         map[string]*Post
+  postsDir      *PostsDir
 	thumbnails    *ImageList
 	imageDir      *ImageDir
 	thumbnailsDir *ImageDir
@@ -33,6 +34,7 @@ func NewThread(fourc *fourc.Thread) *Thread {
 		thumbnailsDir: nil,
 		Post:          NewPost(fourc.OP, nil),
 		posts:         make(map[string]*Post),
+    postsDir:      nil,
 		thumbnails:    NewImageList()}
 }
 
@@ -50,6 +52,7 @@ func (t *Thread) fetchPosts() {
 		t.posts[post.Slug()] = post
 		t.thumbnails.Add(post.GetSamePrefixedSlugThumbnail())
 	}
+	t.postsDir = NewPostsDir("posts", t.posts)
 	t.thumbnails.SortByLocale()
 
 	t.imageDir = NewImageDir("images", t.allPostsImages())
@@ -98,11 +101,7 @@ func (t *Thread) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 		return nil, err
 	}
 
-	for _, post := range t.posts {
-		dirDirs = append(dirDirs, post.GetDirent())
-	}
-
-	dirDirs = append(dirDirs, t.thumbnails.GetContentDirents()...)
+	dirDirs = append(dirDirs, t.postsDir.GetDirent())
 	dirDirs = append(dirDirs, t.imageDir.GetDirent())
 	dirDirs = append(dirDirs, t.thumbnailsDir.GetDirent())
 
@@ -111,6 +110,10 @@ func (t *Thread) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 
 func (t *Thread) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	t.ensureInitialized()
+
+	if name == t.postsDir.Slug() {
+		return t.postsDir, nil
+	}
 
 	if name == t.imageDir.Slug() {
 		return t.imageDir, nil
