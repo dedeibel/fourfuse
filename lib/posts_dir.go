@@ -9,16 +9,16 @@ import (
 )
 
 type PostsDir struct {
-	slug      string
-	inode     uint64
-	posts     map[string]*Post
+	slug  string
+	inode uint64
+	posts map[string]*Post
 }
 
 func NewPostsDir(slug string, posts map[string]*Post) *PostsDir {
 	postsDir := &PostsDir{
-		slug:      slug,
-		inode:     hashs(HASH_POSTS_DIR_PREFIX + slug),
-		posts:     posts}
+		slug:  slug,
+		inode: hashs(HASH_POSTS_DIR_PREFIX + slug),
+		posts: posts}
 	return postsDir
 }
 
@@ -38,10 +38,10 @@ func (d *PostsDir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 
 func (d *PostsDir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	for _, post := range d.posts {
-    if post.Slug() == name {
-		  return post, nil
-    }
-  }
+		if post.Slug() == name {
+			return post, nil
+		}
+	}
 
 	return nil, fuse.ENOENT
 }

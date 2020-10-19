@@ -41,12 +41,12 @@ func (f *RemoteFile) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = f.inode
 	a.Mode = 0444
 
-  // assume 0 means not downloaded, post images have their size already set,
-  // they will be downloaded on ReadAll
-  if EARLY_REMOTE_DOWNLOAD && f.size == 0 {
-    f.Download(true)
-    f.fileAccessCallback.onAccess(f)
-  }
+	// assume 0 means not downloaded, post images have their size already set,
+	// they will be downloaded on ReadAll
+	if EARLY_REMOTE_DOWNLOAD && f.size == 0 {
+		f.Download(true)
+		f.fileAccessCallback.onAccess(f)
+	}
 
 	a.Size = uint64(f.size)
 	return nil

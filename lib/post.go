@@ -100,6 +100,8 @@ func (p *Post) getCommentDirent() fuse.Dirent {
 		Type:  fuse.DT_File}
 }
 
+// TODO truncat names/home/dedeibel/mnt/Fitness/57947438 Anybody else extremely passive here Lifting and going to
+
 func (p *Post) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	if name == subjectSlug {
 		return NewFile(

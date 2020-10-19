@@ -17,8 +17,7 @@ type Thread struct {
 	slug          string
 	inode         uint64
 	posts         map[string]*Post
-  postsDir      *PostsDir
-	thumbnails    *ImageList
+	postsDir      *PostsDir
 	imageDir      *ImageDir
 	thumbnailsDir *ImageDir
 	fetchMutex    sync.Mutex
@@ -34,8 +33,7 @@ func NewThread(fourc *fourc.Thread) *Thread {
 		thumbnailsDir: nil,
 		Post:          NewPost(fourc.OP, nil),
 		posts:         make(map[string]*Post),
-    postsDir:      nil,
-		thumbnails:    NewImageList()}
+		postsDir:      nil}
 }
 
 func (t *Thread) fetchPosts() {
@@ -47,16 +45,20 @@ func (t *Thread) fetchPosts() {
 	}
 	LogDebugf("api call done for: %s\n", t.slug)
 
+	thumbnails := NewImageList()
 	for _, fourcPost := range fourcThread.Posts {
 		post := NewPost(fourcPost, t)
 		t.posts[post.Slug()] = post
-		t.thumbnails.Add(post.GetSamePrefixedSlugThumbnail())
+		thumbnails.Add(post.GetSamePrefixedSlugThumbnail())
 	}
-	t.postsDir = NewPostsDir("posts", t.posts)
-	t.thumbnails.SortByLocale()
 
-	t.imageDir = NewImageDir(t.slug + " images", t.allPostsImages())
-	t.thumbnailsDir = NewImageDirFromImageList("thumbnails", t.thumbnails)
+	t.postsDir = NewPostsDir("posts", t.posts)
+
+	t.imageDir = NewImageDir(t.slug+" images", t.allPostsImages())
+
+	thumbnails.SortByLocale()
+	t.thumbnailsDir = NewImageDirFromImageList("thumbnails", thumbnails)
+
 	LogDebugf("fetch done for: %s\n", t.slug)
 }
 
@@ -125,10 +127,6 @@ func (t *Thread) Lookup(ctx context.Context, name string) (fs.Node, error) {
 
 	if post, postPresent := t.posts[name]; postPresent {
 		return post, nil
-	}
-
-	if thumbnail, thumbnailPresent := t.thumbnails.Get(name); thumbnailPresent {
-		return thumbnail, nil
 	}
 
 	return t.Post.Lookup(ctx, name)

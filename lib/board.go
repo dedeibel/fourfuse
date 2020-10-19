@@ -11,23 +11,23 @@ import (
 )
 
 type Board struct {
-	handle     string
-	name       string
-	slug       string
-	inode      uint64
-	threads    map[string]*Thread
-	thumbnails *ImageList
-	fetchMutex sync.Mutex
+	handle        string
+	name          string
+	slug          string
+	inode         uint64
+	threads       map[string]*Thread
+	thumbnailsDir *ImageDir
+	fetchMutex    sync.Mutex
 }
 
 func NewBoard(handle string, name string) *Board {
 	return &Board{
-		handle:     handle,
-		name:       name,
-		inode:      hashs(HASH_BOARD_PREFIX + handle),
-		slug:       sanitizePathSegment(name),
-		threads:    make(map[string]*Thread),
-		thumbnails: NewImageList()}
+		handle:        handle,
+		name:          name,
+		inode:         hashs(HASH_BOARD_PREFIX + handle),
+		slug:          sanitizePathSegment(name),
+		threads:       make(map[string]*Thread),
+		thumbnailsDir: nil}
 }
 
 func (b *Board) Slug() string {
@@ -42,15 +42,17 @@ func (b *Board) fetchThreads() {
 		Log.Fatal(err)
 	}
 
+	thumbnails := NewImageList()
 	for _, page := range catalog {
 		for _, fourcThread := range page.Threads {
 			thread := NewThread(fourcThread)
 			b.threads[thread.Slug()] = thread
-			b.thumbnails.Add(thread.GetThumbnail())
+			thumbnails.Add(thread.GetThumbnail())
 		}
 	}
 
-	b.thumbnails.SortByLocale()
+	thumbnails.SortByLocale()
+	b.thumbnailsDir = NewImageDirFromImageList("thumbnails", thumbnails)
 }
 
 func (b *Board) ensureInitialized() {
@@ -82,12 +84,11 @@ func (b *Board) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	LogDebugf("read dir for %s\n", b.handle)
 	b.ensureInitialized()
 
-	thumbnailsDirents := b.thumbnails.GetContentDirents()
 	threadsDirents := b.getThreadsDirents()
 
-	var dirDirents = make([]fuse.Dirent, 0, len(thumbnailsDirents)+len(threadsDirents))
+	var dirDirents = make([]fuse.Dirent, 0, 1+len(threadsDirents))
 	dirDirents = append(dirDirents, threadsDirents...)
-	dirDirents = append(dirDirents, thumbnailsDirents...)
+	dirDirents = append(dirDirents, b.thumbnailsDir.GetDirent())
 
 	return dirDirents, nil
 }
@@ -103,10 +104,12 @@ func (b *Board) getThreadsDirents() []fuse.Dirent {
 func (b *Board) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	b.ensureInitialized()
 
+	if name == b.thumbnailsDir.Slug() {
+		return b.thumbnailsDir, nil
+	}
+
 	if thread, present := b.threads[name]; present {
 		return thread, nil
-	} else if thumbnail, present := b.thumbnails.Get(name); present {
-		return thumbnail, nil
 	} else {
 		return nil, fuse.ENOENT
 	}
