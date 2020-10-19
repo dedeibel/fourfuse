@@ -10,6 +10,8 @@ import (
 	"golang.org/x/net/context"
 )
 
+const discussionSlug string = "discussion.txt"
+
 type Thread struct {
 	*Post
 	board         string
@@ -90,8 +92,35 @@ func (t *Thread) hasBeenInitialized() bool {
 	return len(t.posts) > 0
 }
 
+func (p *Thread) getDiscussionSanitized() string {
+	var discussion = ""
+	for _, post := range p.posts {
+		user := post.GetUserName()
+		if len(user) > 0 {
+			discussion += "U: " + user
+			discussion += "\n"
+		}
+		subject := post.GetSubjectSanitized()
+		if len(subject) > 0 {
+			discussion += "S: " + subject
+			discussion += "\n"
+		}
+		discussion += post.GetCommentSanitized()
+		discussion += "\n------\n"
+		discussion += "\n"
+	}
+	return discussion
+}
+
 func (p *Thread) GetThumbnail() *RemoteFile {
 	return p.Post.GetSamePrefixedSlugThumbnail()
+}
+
+func (p *Thread) getDiscussiontDirent() fuse.Dirent {
+	return fuse.Dirent{
+		Inode: hashs(HASH_THREAD_INFO_PREFIX + p.slug + "discussion"),
+		Name:  discussionSlug,
+		Type:  fuse.DT_File}
 }
 
 func (t *Thread) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
@@ -103,6 +132,7 @@ func (t *Thread) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 		return nil, err
 	}
 
+	dirDirs = append(dirDirs, t.getDiscussiontDirent())
 	dirDirs = append(dirDirs, t.postsDir.GetDirent())
 	dirDirs = append(dirDirs, t.imageDir.GetDirent())
 	dirDirs = append(dirDirs, t.thumbnailsDir.GetDirent())
@@ -112,6 +142,12 @@ func (t *Thread) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 
 func (t *Thread) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	t.ensureInitialized()
+
+	if name == discussionSlug {
+		return NewFile(
+			hashs(HASH_THREAD_DISCUSSION+t.slug),
+			t.getDiscussionSanitized()), nil
+	}
 
 	if name == t.postsDir.Slug() {
 		return t.postsDir, nil

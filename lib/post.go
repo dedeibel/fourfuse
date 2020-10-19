@@ -103,11 +103,11 @@ func (p *Post) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	if name == subjectSlug {
 		return NewFile(
 			hashs(HASH_POST_SUBJECT+p.slug),
-			htmlToText(p.fourc.Subject)), nil
+			p.GetSubjectSanitized()), nil
 	} else if name == commentSlug {
 		return NewFile(
 			hashs(HASH_POST_COMMENT+p.slug),
-			p.getCommentSanitized()), nil
+			p.GetCommentSanitized()), nil
 	} else if p.HasImage() && name == p.image.Slug() {
 		return p.image, nil
 	} else {
@@ -119,7 +119,15 @@ func (p *Post) HasImage() bool {
 	return p.image != nil
 }
 
-func (p *Post) getCommentSanitized() string {
+func (p *Post) GetUserName() string {
+	return p.fourc.Name
+}
+
+func (p *Post) GetSubjectSanitized() string {
+	return htmlToText(p.fourc.Subject)
+}
+
+func (p *Post) GetCommentSanitized() string {
 	return htmlToText(p.fourc.Comment)
 }
 

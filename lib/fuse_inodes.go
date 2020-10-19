@@ -8,6 +8,7 @@ const (
 	HASH_BOARD_PREFIX            = "bo"
 	HASH_THREAD_PREFIX           = "th"
 	HASH_THREAD_INFO_PREFIX      = "ti"
+	HASH_THREAD_DISCUSSION       = "td"
 	HASH_POST_PREFIX             = "po"
 	HASH_POST_INFO_PREFIX        = "pi"
 	HASH_POST_IMAGE              = "pm"
