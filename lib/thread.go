@@ -52,12 +52,12 @@ func (t *Thread) fetchPosts() {
 		thumbnails.Add(post.GetSamePrefixedSlugThumbnail())
 	}
 
-	t.postsDir = NewPostsDir("posts", t.posts)
+	t.postsDir = NewPostsDir(t.slug+" posts", t.posts)
 
 	t.imageDir = NewImageDir(t.slug+" images", t.allPostsImages())
 
 	thumbnails.SortByLocale()
-	t.thumbnailsDir = NewImageDirFromImageList("thumbnails", thumbnails)
+	t.thumbnailsDir = NewImageDirFromImageList(t.slug+" thumbnails", thumbnails)
 
 	LogDebugf("fetch done for: %s\n", t.slug)
 }
