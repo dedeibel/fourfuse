@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
@@ -145,6 +146,10 @@ func (p *Post) GetImage() *RemoteFile {
 		uint64(p.fourc.File.Size))
 
 	return file
+}
+
+func (p *Post) Time() time.Time {
+	return p.fourc.Time
 }
 
 func (p *Post) GetThumbnail() *RemoteFile {

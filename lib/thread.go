@@ -1,8 +1,10 @@
 package fourfuse
 
 import (
+	"sort"
 	"strconv"
 	"sync"
+	"time"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
@@ -94,6 +96,15 @@ func (t *Thread) hasBeenInitialized() bool {
 
 func (t *Thread) getDiscussionSanitized() string {
 	var discussion = ""
+
+	posts := make([]*Post, 0, len(t.posts))
+	for _, v := range t.posts {
+		posts = append(posts, v)
+	}
+	sort.SliceStable(posts, func(i, j int) bool {
+		return posts[i].Time().Before(posts[j].Time())
+	})
+
 	for _, post := range t.posts {
 		user := post.GetUserName()
 		if len(user) > 0 {
@@ -105,6 +116,8 @@ func (t *Thread) getDiscussionSanitized() string {
 			discussion += "S: " + subject
 			discussion += "\n"
 		}
+		discussion += "T: " + post.Time().Format(time.RFC3339)
+		discussion += "\n"
 		discussion += post.GetCommentSanitized()
 		discussion += "\n------\n"
 		discussion += "\n"
