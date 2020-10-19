@@ -54,9 +54,8 @@ func GeneratePostSlug(post *fourc.Post) string {
 	slug = replaceHtmlMarkup(slug)
 	slug = fsNameInvalidChars.ReplaceAllString(slug, "")
 	slug = replaceMultipleSpaceByOne(slug)
-	slug = strings.TrimSpace(slug)
-
-	return truncateString(slug, fsNameMaxlen)
+	slug = truncateString(slug, fsNameMaxlen)
+	return strings.TrimSpace(slug)
 }
 
 func removeExifDataNotice(comment string) string {
@@ -99,8 +98,6 @@ func (p *Post) getCommentDirent() fuse.Dirent {
 		Name:  commentSlug,
 		Type:  fuse.DT_File}
 }
-
-// TODO truncat names/home/dedeibel/mnt/Fitness/57947438 Anybody else extremely passive here Lifting and going to
 
 func (p *Post) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	if name == subjectSlug {
