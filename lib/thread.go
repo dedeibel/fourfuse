@@ -92,9 +92,9 @@ func (t *Thread) hasBeenInitialized() bool {
 	return len(t.posts) > 0
 }
 
-func (p *Thread) getDiscussionSanitized() string {
+func (t *Thread) getDiscussionSanitized() string {
 	var discussion = ""
-	for _, post := range p.posts {
+	for _, post := range t.posts {
 		user := post.GetUserName()
 		if len(user) > 0 {
 			discussion += "U: " + user
@@ -112,13 +112,13 @@ func (p *Thread) getDiscussionSanitized() string {
 	return discussion
 }
 
-func (p *Thread) GetThumbnail() *RemoteFile {
-	return p.Post.GetSamePrefixedSlugThumbnail()
+func (t *Thread) GetThumbnail() *RemoteFile {
+	return t.Post.GetSamePrefixedSlugThumbnail()
 }
 
-func (p *Thread) getDiscussiontDirent() fuse.Dirent {
+func (t *Thread) getDiscussiontDirent() fuse.Dirent {
 	return fuse.Dirent{
-		Inode: hashs(HASH_THREAD_INFO_PREFIX + p.slug + "discussion"),
+		Inode: hashs(HASH_THREAD_INFO_PREFIX + t.slug + "discussion"),
 		Name:  discussionSlug,
 		Type:  fuse.DT_File}
 }
