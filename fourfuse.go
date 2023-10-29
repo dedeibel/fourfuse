@@ -37,21 +37,16 @@ func main() {
 		mountpoint,
 		fuse.AsyncRead(),
 		fuse.FSName("4get"),
-		fuse.Subtype("4get"),
-		fuse.VolumeName("4get"))
+		fuse.Subtype("4get"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer c.Close()
+
 	registerCleanupHandler(mountpoint)
 
 	err = fs.Serve(c, fourfuse.NewFs(fourfuse.LoadBoards()))
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	<-c.Ready
-	if err := c.MountError; err != nil {
 		log.Fatal(err)
 	}
 }
